@@ -26,14 +26,15 @@ data Argument = TargetId ID | ArgFunction Function
 data Function = Function { id::ID, args::[Argument]} deriving (Show, Eq)
 data Action = Action { conditions::[Function], action::Function} deriving (Show, Eq)
 
-data JSON = Number Int | String String | Actions[Action] | Array [JSON] | Object [Pair] | Layout [TileLine] | UseTimes UseTimes 
+data JSON = Number Int | String String | Actions[Action] | Array [JSON] | Object [Pair] | Layout [TileLine] | Direction Direction | UseTimes UseTimes 
     deriving (Show, Eq)
 
+-- Parser that skips over whitespaces
 whitespace :: Parser ()
 whitespace = skipMany (oneOf " \t\n")
 
 parseJSON :: Parser JSON
-parseJSON = parseString <|> parseNumber <|> parseArray <|> parseObject <|> parseLayout <|> parseLevel -- <|> parseUseTimes <|> parseAction <|> parseDirection
+parseJSON = parseString <|> parseNumber <|> parseArray <|> parseObject <|> parseLayout <|> parseLevel <|> parseUseTimes <|> parseActions <|> parseDirection
 
 parseString :: Parser JSON
 parseString = String <$> (char '"' *> many1 (letter <|> space) <* char '"')
@@ -48,23 +49,26 @@ parseObject :: Parser JSON
 parseObject = Object <$> (whitespace *> char '{' *> whitespace *> sepBy parsePair (char ',') <* whitespace <* char '}' <* whitespace)
 
 parseObjID :: Parser ID
-parseObjID = ID <$> (whitespace *> many1 letter <* whitespace)
+parseObjID = ID <$> (whitespace *> many1 alphaNum <* whitespace)
 
+-- Parses a pair based on the type of the pair
 parsePair :: Parser Pair
 parsePair = do
     pairType <- whitespace >> parseObjID
     if pairType == ID "layout" then 
         Pair pairType <$> (whitespace >> char ':' >> parseLayout)
-        -- else if pairType == ID "useTimes" then
-        --     Pair pairType <$> (whitespace >> char ':' >> parseUseTimes) <* whitespace
-        -- else if pairType == ID "actions" then
-        --     Pair pairType <$> (whitespace >> char ':' >> parseAction) <* whitespace
-        -- else if pairType == ID "direction" then
-        --     Pair pairType <$> (whitespace >> char ':' >> parseDirection) <* whitespace
+        else if pairType == ID "useTimes" then
+            Pair pairType <$> (whitespace >> char ':' >> parseUseTimes) <* whitespace
+        else if pairType == ID "actions" then
+            Pair pairType <$> (whitespace >> char ':' >> parseActions) <* whitespace
+        else if pairType == ID "direction" then
+            Pair pairType <$> (whitespace >> char ':' >> parseDirection) <* whitespace
         else Pair pairType <$> (char ':' >> whitespace >> parseJSON <* whitespace)
 
 parseLevel:: Parser JSON
 parseLevel = Object <$> (whitespace *> many1 parsePair <* whitespace)
+
+------------------ Layout parser ----------------
 
 parseLayout :: Parser JSON
 parseLayout = Layout <$> (whitespace *> char '{' *> whitespace *> char '|' *> whitespace *> sepBy parseTileLine (char '|') 
@@ -91,20 +95,51 @@ parseStart = char 's' *> return Start
 parseEnd :: Parser Tile
 parseEnd = char 'e' *> return End
 
---TODO: parseUseTimes is not yet implemented
-parseUseTimes :: Parser JSON
-parseUseTimes = undefined
+------------------ UseTimes parser ------------------
 
---TODO: parseAction is not yet implemented
-parseAction :: Parser JSON
-parseAction = undefined
+parseUseTimes :: Parser JSON
+parseUseTimes = whitespace *> (parseInfinite <|> parseTimesUsed) <* whitespace
+
+parseTimesUsed :: Parser JSON
+parseTimesUsed = UseTimes <$> (TimesUsed . read <$> many1 digit)
+
+parseInfinite :: Parser JSON
+parseInfinite = UseTimes <$> (whitespace *> (string "infinite" *> return Infinite) <* whitespace)
+
+------------------ Actions parser ------------------
+
+parseActions :: Parser JSON
+parseActions = Actions <$> (whitespace *> char '{' *> whitespace *> (sepBy parseAction (char ',')) <* whitespace <* char '}' <* whitespace)
+
+parseAction :: Parser Action
+parseAction = (whitespace *> char '[' *> sepBy parseFunction (char ',') <* char ']' <* whitespace) 
+    >>= \conditions -> Action conditions <$> (whitespace *> parseFunction <* whitespace)
+
+parseFunction :: Parser Function
+parseFunction = whitespace *> parseObjID <* whitespace >>= \funcId ->
+    Function funcId <$> (whitespace *> char '(' *> whitespace *> sepBy parseArgument (char ',') <* whitespace <* char ')' <* whitespace)
+
+parseArgument :: Parser Argument
+parseArgument = try (ArgFunction <$> parseFunction) <|> (TargetId <$> parseObjID)
+
+------------------ Direction parser ------------------
 
 parseDirection :: Parser JSON
-parseDirection = undefined
+parseDirection = Direction <$> (whitespace *> (parseUp <|> parseDown <|> parseLeft <|> parseRight) <* whitespace)
 
-parseConfigFile :: JSON
-parseConfigFile = undefined
+parseUp :: Parser Direction
+parseUp = (string "up" *> return Up)
 
+parseDown :: Parser Direction
+parseDown = (string "down" *> return Down)
+
+parseLeft :: Parser Direction
+parseLeft = (string "left" *> return Parser.Left)
+
+parseRight :: Parser Direction
+parseRight = (string "right" *> return Parser.Right)
+
+-- Used for testing the parser
 parseTest :: String -> IO ()
 parseTest level = do
     withFile level ReadMode (\handle -> do
@@ -114,3 +149,4 @@ parseTest level = do
             Prelude.Left err -> error $ show err
             Prelude.Right json -> putStr (show json)
         )
+        
