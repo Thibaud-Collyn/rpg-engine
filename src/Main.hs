@@ -1,4 +1,6 @@
-import VoorbeeldModule (hoi)
+import GameRenderer
+import Parser
+import Datastructures
 
 main :: IO ()
-main = putStrLn hoi
+main = undefined

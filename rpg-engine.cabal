@@ -7,7 +7,7 @@ build-type:     Simple
 library
   hs-source-dirs: lib
   build-depends: base >= 4.7 && <5, parsec >=3.1.15.1
-  exposed-modules: VoorbeeldModule, Parser
+  exposed-modules: Parser, GameRenderer, Datastructures, LevelLoader
 
 executable rpg-engine
   main-is: Main.hs

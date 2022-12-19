@@ -3,31 +3,7 @@ module Parser where
 import Text.Parsec
 import Text.Parsec.String (Parser)
 import System.IO
-
---FIXME: make separate Datastructures file and import it here
-
-data ID = ID String deriving (Show, Eq)
-data Pair = Pair ID JSON deriving (Show, Eq)
-
-data TileLine = TileLine [Tile] deriving (Show, Eq)
-
-data Tile = Empty | Wall | Floor | Start | End 
-    deriving (Show, Eq)
-
-data Direction = Up | Down | Left | Right 
-    deriving (Show, Eq)
-
-data UseTimes = Infinite | TimesUsed Int 
-    deriving (Show, Eq)
-
-data Argument = TargetId ID | ArgFunction Function 
-    deriving (Show, Eq)
-
-data Function = Function { id::ID, args::[Argument]} deriving (Show, Eq)
-data Action = Action { conditions::[Function], action::Function} deriving (Show, Eq)
-
-data JSON = Number Int | String String | Actions[Action] | Array [JSON] | Object [Pair] | Layout [TileLine] | Direction Direction | UseTimes UseTimes 
-    deriving (Show, Eq)
+import Datastructures
 
 -- Parser that skips over whitespaces
 whitespace :: Parser ()
@@ -81,7 +57,7 @@ parseTile :: Parser Tile
 parseTile = parseEmpty <|> parseWall <|> parseFloor <|> parseStart <|> parseEnd
 
 parseEmpty :: Parser Tile
-parseEmpty = char 'x' *> return Parser.Empty
+parseEmpty = char 'x' *> return Datastructures.Empty
 
 parseWall :: Parser Tile
 parseWall = char '*' *> return Wall
@@ -134,10 +110,10 @@ parseDown :: Parser Direction
 parseDown = (string "down" *> return Down)
 
 parseLeft :: Parser Direction
-parseLeft = (string "left" *> return Parser.Left)
+parseLeft = (string "left" *> return Datastructures.Left)
 
 parseRight :: Parser Direction
-parseRight = (string "right" *> return Parser.Right)
+parseRight = (string "right" *> return Datastructures.Right)
 
 -- Used for testing the parser
 parseTest :: String -> IO ()
