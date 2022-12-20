@@ -15,6 +15,9 @@ parseJSON = parseString <|> parseNumber <|> parseArray <|> parseObject <|> parse
 parseString :: Parser JSON
 parseString = String <$> (char '"' *> many1 (letter <|> space) <* char '"')
 
+parseFunctionId :: Parser String
+parseFunctionId = many1 (letter <|> space)
+
 parseNumber :: Parser JSON
 parseNumber = Number . read <$> many1 digit <* whitespace
 
@@ -92,7 +95,7 @@ parseAction = (whitespace *> char '[' *> sepBy parseFunction (char ',') <* char 
     >>= \conditions -> Action conditions <$> (whitespace *> parseFunction <* whitespace)
 
 parseFunction :: Parser Function
-parseFunction = whitespace *> parseString <* whitespace >>= \(String funcId) ->
+parseFunction = whitespace *> parseFunctionId >>= \funcId ->
     Function funcId <$> (whitespace *> char '(' *> whitespace *> sepBy parseArgument (char ',') <* whitespace <* char ')' <* whitespace)
 
 parseArgument :: Parser Argument
