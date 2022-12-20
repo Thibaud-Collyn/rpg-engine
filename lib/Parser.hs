@@ -92,7 +92,7 @@ parseAction = (whitespace *> char '[' *> sepBy parseFunction (char ',') <* char 
     >>= \conditions -> Action conditions <$> (whitespace *> parseFunction <* whitespace)
 
 parseFunction :: Parser Function
-parseFunction = whitespace *> parseObjID <* whitespace >>= \funcId ->
+parseFunction = whitespace *> parseString <* whitespace >>= \(String funcId) ->
     Function funcId <$> (whitespace *> char '(' *> whitespace *> sepBy parseArgument (char ',') <* whitespace <* char ')' <* whitespace)
 
 parseArgument :: Parser Argument

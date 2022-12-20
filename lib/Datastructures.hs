@@ -32,11 +32,11 @@ data Player = Player {playerHP::Int, inventory::[GameItem], playerX::Int, player
 
 data Level = Level { layout::[TileLine], items::[GameItem], entities::[Entity]} deriving (Show, Eq)
 
-data GameItem = GameItem { itemId::ID, itemX::Int, itemY::Int, itemName::String, itemDescription::String, itemUseTimes::UseTimes, itemActions::[Action]} deriving (Show, Eq)
+data GameItem = GameItem { itemId::String, itemX::Int, itemY::Int, itemName::String, itemDescription::String, itemUseTimes::UseTimes, itemActions::[Action]} deriving (Show, Eq)
 
-data Entity = Entity { entityId::ID, entityX::Int, entityY::Int, entityName::String, entityDescription::String, entityDirection::Maybe Direction, entityHP::Maybe Int, entityValue::Maybe Int, entityActions::[Action]} deriving (Show, Eq)
+data Entity = Entity { entityId::String, entityX::Int, entityY::Int, entityName::String, entityDescription::String, entityDirection::Maybe Direction, entityHP::Maybe Int, entityValue::Maybe Int, entityActions::[Action]} deriving (Show, Eq)
 
-data Function = Function { id::ID, args::[Argument]} deriving (Show, Eq)
+data Function = Function { id::String, args::[Argument]} deriving (Show, Eq)
 
 data Action = Action { conditions::[Function], action::Function} deriving (Show, Eq)
 
@@ -61,3 +61,22 @@ getValue (Pair _ value) = value
 -- Returns int value of json number
 toInt :: JSON -> Int
 toInt (Number n) = n
+
+-- Returns string value of json string
+toStr :: JSON -> String
+toStr (String s) = s
+
+-- Returns Layout as array of TileLines
+layoutToArray :: JSON -> [TileLine]
+layoutToArray (Layout layout) = layout
+
+-- Returns UseTimes of JSON
+toUseTimes :: JSON -> UseTimes
+toUseTimes (UseTimes useTimes) = useTimes
+
+-- Returns Direction of JSON
+toDirection :: JSON -> Direction
+toDirection (Direction direction) = direction
+
+toActions :: JSON -> [Action]
+toActions (Actions actions) = actions
