@@ -14,10 +14,16 @@ initGame levelName = do
         Prelude.Right levelJson -> return $ initGameFromJson levelJson
 
 initGameFromJson :: JSON -> Game
-initGameFromJson (Object pairs) = Game (initPlayer (getValue (getPair pairs (ID "player")))) (initLevels (getValue ((getPair pairs (ID "levels"))))) 0
+initGameFromJson (Object pairs) = setPlayerLocation (Game (initPlayer (getValue (getPair pairs (ID "player")))) (initLevels (getValue ((getPair pairs (ID "levels"))))) 0)
 
 initPlayer :: JSON -> Player
 initPlayer (Object pairs) = Player (toInt (getValue (getPair pairs (ID "hp")))) (initItems (getValue (getPair pairs (ID "inventory")))) 0 0 Datastructures.Right
+
+setPlayerLocation :: Game -> Game
+setPlayerLocation game = game{player = (player game){playerX = x, playerY = y}} where (x, y) = getStartLocation ((levels game) !! (currentLevel game)) 
+
+getStartLocation :: Level -> (Int, Int)
+getStartLocation level = head [(x, y) |y <- [0..length tileLines-1], x <- [0..(length (tileLineToArray (tileLines!!y))) -1], tileLineToArray((tileLines!!y))!!x == Start] where tileLines = reverse (layout level)
 
 ------------------ Initializing levels ------------------
 initLevels :: JSON -> [Level]

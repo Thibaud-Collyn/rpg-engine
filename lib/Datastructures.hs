@@ -80,3 +80,6 @@ toDirection (Direction direction) = direction
 
 toActions :: JSON -> [Action]
 toActions (Actions actions) = actions
+
+tileLineToArray :: TileLine -> [Tile]
+tileLineToArray (TileLine tileLine) = tileLine

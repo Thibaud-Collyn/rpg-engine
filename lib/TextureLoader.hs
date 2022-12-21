@@ -13,17 +13,18 @@ data GameTextures = GameTextures {
     endTile :: Picture,
     doorLocked :: Picture,
     doorUnlocked :: Picture,
-    player :: Picture,
+    playerKnight :: Picture,
     key :: Picture,
     sword :: Picture,
     dagger :: Picture,
     potion :: Picture,
-    demon :: Picture
+    devil :: Picture
 } deriving (Show, Eq)
 
 
 data GuiTextures = GuiTextures {
-    background :: Picture
+    background :: Picture,
+    itemBar :: Picture
 }
 
 getGameTextures :: GameTextures
@@ -34,17 +35,18 @@ getGameTextures = GameTextures {
     endTile = loadPicture "game"  "stair_nextlevel",
     doorLocked = loadPicture "game" "door_locked",
     doorUnlocked = loadPicture "game" "door_open",
-    player = loadPicture "game" "knight",
+    playerKnight = loadPicture "game" "knight",
     key = loadPicture "game" "key_silver",
     sword = loadPicture "game" "sword",
     dagger = loadPicture "game" "dagger.",
     potion = loadPicture "game" "potion",
-    demon = loadPicture "game" "demon"
+    devil = loadPicture "game" "devil"
 }
 
 getGuiTextures :: GuiTextures
 getGuiTextures = GuiTextures {
-    background = loadPicture "gui" "gui_background"
+    background = loadPicture "gui" "gui_background",
+    itemBar = loadPicture "gui" "gui_itemBar"
 }
 
 textureByID :: String -> GameTextures -> Picture
@@ -52,7 +54,7 @@ textureByID id textures | id == "key" = key textures
                         | id == "sword" = sword textures
                         | id == "dagger" = dagger textures
                         | id == "potion" = potion textures
-                        | id == "demon" = demon textures
+                        | id == "devil" = devil textures
                         | id == "door" = doorLocked textures
                         | otherwise = Blank
 
