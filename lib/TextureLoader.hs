@@ -24,7 +24,9 @@ data GameTextures = GameTextures {
 
 data GuiTextures = GuiTextures {
     background :: Picture,
-    itemBar :: Picture
+    itemBar :: Picture,
+    itemSlot :: Picture,
+    actionBar :: Picture
 }
 
 getGameTextures :: GameTextures
@@ -38,7 +40,7 @@ getGameTextures = GameTextures {
     playerKnight = loadPicture "game" "knight",
     key = loadPicture "game" "key_silver",
     sword = loadPicture "game" "sword",
-    dagger = loadPicture "game" "dagger.",
+    dagger = loadPicture "game" "dagger",
     potion = loadPicture "game" "potion",
     devil = loadPicture "game" "devil"
 }
@@ -46,7 +48,9 @@ getGameTextures = GameTextures {
 getGuiTextures :: GuiTextures
 getGuiTextures = GuiTextures {
     background = loadPicture "gui" "gui_background",
-    itemBar = loadPicture "gui" "gui_itemBar"
+    itemBar = loadPicture "gui" "gui_itemBar",
+    itemSlot = loadPicture "gui" "gui_itemSlot",
+    actionBar = loadPicture "gui" "gui_actionBar"
 }
 
 textureByID :: String -> GameTextures -> Picture

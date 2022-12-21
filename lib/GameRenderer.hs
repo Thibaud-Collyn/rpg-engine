@@ -18,6 +18,9 @@ windowPosition = (200, 200)
 tileOffset :: Int
 tileOffset = 32
 
+itemSlotOffset :: Int
+itemSlotOffset = 60
+
 window :: Display
 window = InWindow "Haskell Adventure" (900, 600) windowPosition
 
@@ -30,7 +33,7 @@ renderLevel :: Level -> Player -> Picture
 renderLevel currentLevel currentPlayer = pictures [renderGui currentLevel currentPlayer, renderLayout (layout currentLevel), renderItems (items currentLevel), renderEntities (entities currentLevel), renderPlayer currentPlayer]
 
 renderLayout :: [TileLine] -> Picture
-renderLayout layout = pictures [renderTileLine ((reverse layout)!!y) y | y <- [0..length layout - 1]]
+renderLayout layout = pictures [renderTileLine (layout!!y) y | y <- [0..length layout - 1]]
 
 renderTileLine :: TileLine -> Int -> Picture
 renderTileLine (TileLine tiles) y = pictures [translate (fromIntegral (x*tileOffset)) (fromIntegral (y*tileOffset)) (renderTile (tiles!!x))| x <- [0..length tiles - 1]]
@@ -74,8 +77,18 @@ renderBackground :: Picture
 renderBackground = scale 0.7 0.9 (background getGuiTextures)
 
 renderItemBar :: [GameItem] -> Picture
-renderItemBar items = renderBar
+renderItemBar items = pictures [renderBar, renderItemSlots, renderInventory items, renderActionBar]
 
---TODO: fix bar assets
 renderBar :: Picture
-renderBar = translate (fromIntegral (5*tileOffset)) (fromIntegral (-4*tileOffset)) (itemBar getGuiTextures)
+renderBar = translate (fromIntegral (2*tileOffset)) (fromIntegral (-5*tileOffset)) (itemBar getGuiTextures)
+
+renderItemSlots :: Picture
+renderItemSlots = pictures [translate (fromIntegral (-175 + (x*itemSlotOffset))) (fromIntegral (-5*tileOffset)) image | x <- [0..8]] where image = itemSlot getGuiTextures
+
+renderInventory :: [GameItem] -> Picture
+renderInventory items = pictures [translate (fromIntegral (-175 + (x*itemSlotOffset))) (fromIntegral (-5*tileOffset)) (textureByID (itemId (items!!x)) getGameTextures) | x <- [0..(length items) -1]]
+
+renderActionBar :: Picture
+renderActionBar = translate (-210.0) 90.0 (scale 0.7 0.9 (actionBar getGuiTextures))
+
+--TODO: render all actions

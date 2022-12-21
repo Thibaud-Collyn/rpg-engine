@@ -23,7 +23,7 @@ setPlayerLocation :: Game -> Game
 setPlayerLocation game = game{player = (player game){playerX = x, playerY = y}} where (x, y) = getStartLocation ((levels game) !! (currentLevel game)) 
 
 getStartLocation :: Level -> (Int, Int)
-getStartLocation level = head [(x, y) |y <- [0..length tileLines-1], x <- [0..(length (tileLineToArray (tileLines!!y))) -1], tileLineToArray((tileLines!!y))!!x == Start] where tileLines = reverse (layout level)
+getStartLocation level = head [(x, y) |y <- [0..length tileLines-1], x <- [0..(length (tileLineToArray (tileLines!!y))) -1], tileLineToArray((tileLines!!y))!!x == Start] where tileLines = (layout level)
 
 ------------------ Initializing levels ------------------
 initLevels :: JSON -> [Level]
@@ -34,7 +34,7 @@ initLevel (Object lvl) = Level (initLayout (getValue (getPair lvl (ID "layout"))
 
 initLayout :: JSON -> [TileLine]
 initLayout (Layout []) = []
-initLayout tileLines = layoutToArray tileLines
+initLayout tileLines = reverse (layoutToArray tileLines)
 
 ------------------ Initializing items ------------------
 initItems :: JSON -> [GameItem]
