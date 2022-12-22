@@ -26,7 +26,10 @@ data JSON = Number Int | String String | Actions[Action] | Array [JSON] | Object
     deriving (Show, Eq)
 
 -------------------- Game data structures --------------------
-data Game = Game { player::Player, levels::[Level], currentLevel::Int} deriving (Show, Eq)
+data GameState = Selecting | Playing | Completed
+    deriving (Show, Eq)
+
+data Game = Game { player::Player, levels::[Level], currentLevel::Int, state::GameState, selector::Int} deriving (Show, Eq)
 
 data Player = Player {playerHP::Int, inventory::[GameItem], playerX::Int, playerY::Int, playerDirection::Direction} deriving (Show, Eq)
 
@@ -83,3 +86,11 @@ toActions (Actions actions) = actions
 
 tileLineToArray :: TileLine -> [Tile]
 tileLineToArray (TileLine tileLine) = tileLine
+
+-- Returns an ampty game used in the level selector
+emptyGame :: Game
+emptyGame = Game { player = (Player 1 [] 0 0 Datastructures.Right), levels = [], currentLevel = 0, state = Selecting, selector = 0}
+
+-- Used for testing
+emptyGameCompleted :: Game
+emptyGameCompleted = Game { player = (Player 1 [] 0 0 Datastructures.Right), levels = [], currentLevel = 0, state = Completed, selector = 0}

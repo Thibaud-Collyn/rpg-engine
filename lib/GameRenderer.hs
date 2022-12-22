@@ -22,11 +22,11 @@ itemSlotOffset :: Int
 itemSlotOffset = 60
 
 window :: Display
-window = InWindow "Haskell Adventure" (900, 600) windowPosition
+window = InWindow "Haskell Adventure" (810, 600) windowPosition
 
 --FIXME: render game and gui
 renderGame :: Game -> Picture
-renderGame game =  renderLevel ((levels game)!!currentLevel game) (player game)
+renderGame game =  renderLevel (levels game !! currentLevel game) (player game)
 
 -------------------- Render level --------------------
 renderLevel :: Level -> Player -> Picture
@@ -71,7 +71,7 @@ rotateInDirection dir pic | isNothing dir = pic
 
 -------------------- Render GUI --------------------
 renderGui :: Level -> Player -> Picture
-renderGui lvl player = pictures [renderBackground, renderItemBar (inventory player)]
+renderGui lvl player = pictures [renderBackground, renderItemBar (inventory player), renderHP player]
 
 renderBackground :: Picture
 renderBackground = scale 0.7 0.9 (background getGuiTextures)
@@ -90,5 +90,8 @@ renderInventory items = pictures [translate (fromIntegral (-175 + (x*itemSlotOff
 
 renderActionBar :: Picture
 renderActionBar = translate (-210.0) 90.0 (scale 0.7 0.9 (actionBar getGuiTextures))
+
+renderHP :: Player -> Picture
+renderHP player = translate (-350.0) (fromIntegral (-5*tileOffset)) (color white (scale 0.15 0.15 (text ("HP = " ++ (show (playerHP player))))))
 
 --TODO: render all actions

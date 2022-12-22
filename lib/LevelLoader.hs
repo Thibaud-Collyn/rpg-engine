@@ -14,7 +14,7 @@ initGame levelName = do
         Prelude.Right levelJson -> return $ initGameFromJson levelJson
 
 initGameFromJson :: JSON -> Game
-initGameFromJson (Object pairs) = setPlayerLocation (Game (initPlayer (getValue (getPair pairs (ID "player")))) (initLevels (getValue ((getPair pairs (ID "levels"))))) 0)
+initGameFromJson (Object pairs) = setPlayerLocation (Game (initPlayer (getValue (getPair pairs (ID "player")))) (initLevels (getValue ((getPair pairs (ID "levels"))))) 0 Playing 0)
 
 initPlayer :: JSON -> Player
 initPlayer (Object pairs) = Player (toInt (getValue (getPair pairs (ID "hp")))) (initItems (getValue (getPair pairs (ID "inventory")))) 0 0 Datastructures.Right
