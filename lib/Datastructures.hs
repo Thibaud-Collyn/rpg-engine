@@ -69,6 +69,9 @@ toInt (Number n) = n
 toStr :: JSON -> String
 toStr (String s) = s
 
+idToStr :: ID -> String
+idToStr (ID s) = s
+
 -- Returns Layout as array of TileLines
 layoutToArray :: JSON -> [TileLine]
 layoutToArray (Layout layout) = layout
@@ -94,3 +97,9 @@ emptyGame = Game { player = (Player 1 [] 0 0 Datastructures.Right), levels = [],
 -- Used for testing
 emptyGameCompleted :: Game
 emptyGameCompleted = Game { player = (Player 1 [] 0 0 Datastructures.Right), levels = [], currentLevel = 0, state = Completed, selector = 0}
+
+argumentToId :: Argument -> String
+argumentToId (TargetId id) = idToStr id
+
+argumentToFunction :: Argument -> Function
+argumentToFunction (ArgFunction function) = function

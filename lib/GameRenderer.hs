@@ -3,6 +3,7 @@ module GameRenderer where
 import Datastructures
 import LevelLoader
 import TextureLoader
+import GameLogica
 import Graphics.Gloss
 import Graphics.Gloss.Juicy
 import Graphics.Gloss.Interface.IO.Game
@@ -26,11 +27,11 @@ window = InWindow "Haskell Adventure" (810, 600) windowPosition
 
 --FIXME: render game and gui
 renderGame :: Game -> Picture
-renderGame game =  renderLevel (levels game !! currentLevel game) (player game)
+renderGame game = renderLevel game (levels game !! currentLevel game) (player game)
 
 -------------------- Render level --------------------
-renderLevel :: Level -> Player -> Picture
-renderLevel currentLevel currentPlayer = pictures [renderGui currentLevel currentPlayer, renderLayout (layout currentLevel), renderItems (items currentLevel), renderEntities (entities currentLevel), renderPlayer currentPlayer]
+renderLevel :: Game -> Level -> Player -> Picture
+renderLevel game currentLevel currentPlayer = pictures [renderGui game currentLevel currentPlayer, renderLayout (layout currentLevel), renderItems (items currentLevel), renderEntities (entities currentLevel), renderPlayer currentPlayer]
 
 renderLayout :: [TileLine] -> Picture
 renderLayout layout = pictures [renderTileLine (layout!!y) y | y <- [0..length layout - 1]]
@@ -70,14 +71,14 @@ rotateInDirection dir pic | isNothing dir = pic
                           | otherwise = pic
 
 -------------------- Render GUI --------------------
-renderGui :: Level -> Player -> Picture
-renderGui lvl player = pictures [renderBackground, renderItemBar (inventory player), renderHP player]
+renderGui :: Game -> Level -> Player -> Picture
+renderGui game lvl player = pictures [renderBackground, renderItemBar (inventory player), renderHP player, renderActionBar  game]
 
 renderBackground :: Picture
 renderBackground = scale 0.7 0.9 (background getGuiTextures)
 
 renderItemBar :: [GameItem] -> Picture
-renderItemBar items = pictures [renderBar, renderItemSlots, renderInventory items, renderActionBar]
+renderItemBar items = pictures [renderBar, renderItemSlots, renderInventory items]
 
 renderBar :: Picture
 renderBar = translate (fromIntegral (2*tileOffset)) (fromIntegral (-5*tileOffset)) (itemBar getGuiTextures)
@@ -88,10 +89,14 @@ renderItemSlots = pictures [translate (fromIntegral (-175 + (x*itemSlotOffset)))
 renderInventory :: [GameItem] -> Picture
 renderInventory items = pictures [translate (fromIntegral (-175 + (x*itemSlotOffset))) (fromIntegral (-5*tileOffset)) (textureByID (itemId (items!!x)) getGameTextures) | x <- [0..(length items) -1]]
 
-renderActionBar :: Picture
-renderActionBar = translate (-210.0) 90.0 (scale 0.7 0.9 (actionBar getGuiTextures))
+renderActionBar :: Game -> Picture
+renderActionBar game = pictures [translate (-210.0) 90.0 (scale 0.7 0.9 (actionBar getGuiTextures)), renderActions (getActions game), translate (-300.0) 190.0 (color white (scale 0.3 0.3 (text "ACTIONS")))]
+
+renderActions :: [Action] -> Picture
+renderActions rActions = pictures [translate (-300.0) (fromIntegral (160 - (30*x))) (color white (scale 0.2 0.2 (text (Datastructures.id (action (rActions!!x)))))) | x <- [0..(length rActions) -1]]
 
 renderHP :: Player -> Picture
 renderHP player = translate (-350.0) (fromIntegral (-5*tileOffset)) (color white (scale 0.15 0.15 (text ("HP = " ++ (show (playerHP player))))))
+
 
 --TODO: render all actions

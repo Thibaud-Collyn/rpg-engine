@@ -56,7 +56,7 @@ levels: [
         ],
 
         entities: [
-            {
+          {
                 id: "door",
                 x: 0,
                 y: 3,
@@ -68,7 +68,7 @@ levels: [
                     [inventoryContains(key)] useItem(key),
                     [] leave()
                 }
-            }
+            }  
         ]
     },
     {
