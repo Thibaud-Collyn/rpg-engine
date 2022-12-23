@@ -8,7 +8,7 @@ import Graphics.Gloss
 import Graphics.Gloss.Juicy
 import Graphics.Gloss.Interface.IO.Game
 import System.IO
-import Data.Maybe (fromJust, isNothing)
+import Data.Maybe (fromJust, isNothing, isJust)
 
 fps :: Int
 fps = 60
@@ -25,7 +25,6 @@ itemSlotOffset = 60
 window :: Display
 window = InWindow "Haskell Adventure" (810, 600) windowPosition
 
---FIXME: render game and gui
 renderGame :: Game -> Picture
 renderGame game = renderLevel game (levels game !! currentLevel game) (player game)
 
@@ -60,7 +59,8 @@ renderEntities :: [Entity] -> Picture
 renderEntities entities = pictures [renderEntity entity | entity <- entities]
 
 renderEntity :: Entity -> Picture
-renderEntity entity = (translate (fromIntegral (((entityX entity)+1)*tileOffset)) (fromIntegral (((entityY entity)+1)*tileOffset)) (rotateInDirection (entityDirection entity) (textureByID (entityId entity) getGameTextures)))
+renderEntity entity | entityId entity == "door" && isJust (entityValue entity) = (translate (fromIntegral (((entityX entity)+1)*tileOffset)) (fromIntegral (((entityY entity)+1)*tileOffset)) (rotateInDirection (entityDirection entity) (doorUnlocked getGameTextures)))
+                    | otherwise = (translate (fromIntegral (((entityX entity)+1)*tileOffset)) (fromIntegral (((entityY entity)+1)*tileOffset)) (rotateInDirection (entityDirection entity) (textureByID (entityId entity) getGameTextures)))
 
 rotateInDirection :: Maybe Direction -> Picture -> Picture
 rotateInDirection dir pic | isNothing dir = pic
@@ -93,10 +93,7 @@ renderActionBar :: Game -> Picture
 renderActionBar game = pictures [translate (-210.0) 90.0 (scale 0.7 0.9 (actionBar getGuiTextures)), renderActions (getActions game), translate (-300.0) 190.0 (color white (scale 0.3 0.3 (text "ACTIONS")))]
 
 renderActions :: [Action] -> Picture
-renderActions rActions = pictures [translate (-300.0) (fromIntegral (160 - (30*x))) (color white (scale 0.2 0.2 (text (Datastructures.id (action (rActions!!x)))))) | x <- [0..(length rActions) -1]]
+renderActions rActions = pictures [translate (-300.0) (fromIntegral (160 - (30*x))) (color white (scale 0.2 0.2 (text ((show x) ++ ") " ++ Datastructures.id (action (rActions!!x)))))) | x <- [0..(length rActions) -1]]
 
 renderHP :: Player -> Picture
 renderHP player = translate (-350.0) (fromIntegral (-5*tileOffset)) (color white (scale 0.15 0.15 (text ("HP = " ++ (show (playerHP player))))))
-
-
---TODO: render all actions

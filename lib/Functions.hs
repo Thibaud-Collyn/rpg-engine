@@ -11,7 +11,7 @@ inventoryContains :: Player -> String -> Bool
 inventoryContains player objId = inventory player `contains` objId
 
 contains :: [GameItem] -> String -> Bool
-cintains [] _ = False
+contains [] _ = False
 contains (x:xs) objId = objId == itemId x || contains xs objId
 
 retrieveItem :: Game -> String -> Game
@@ -39,3 +39,20 @@ getEntity level id = [entity | entity <- entities level, entityId entity == id]
 
 getItems :: Level -> String -> [GameItem]
 getItems level id = [item | item <- items level, itemId item == id]
+
+useItem :: Game -> String -> Game
+useItem game item = game {levels = replaceNth (currentLevel game) lvl {entities = [if e == (findLockedDoor game item) then e {entityValue = Just 0} else e |e <- entities lvl]} (levels game)} where lvl = levels game !! currentLevel game
+
+-- Finds a locked door that uses key with given id and is in range of the player
+findLockedDoor :: Game -> String -> Entity
+findLockedDoor game id = head [entity | entity <- entities (levels game !! currentLevel game), (getKeyId entity) == id && inRange (playerX (player game), playerY (player game)) (entityX entity, entityY entity)]
+
+getKeyId :: Entity -> String
+getKeyId entity = head [argumentToId (head (args (action a))) | a <- entityActions entity, (Datastructures.id (action a)) == "useItem"]
+
+-- replaces nth element in a list with a new value
+replaceNth :: Int -> a -> [a] -> [a]
+replaceNth _ _ [] = []
+replaceNth n newVal (x:xs)
+    | n == 0 = newVal:xs
+    | otherwise = x:replaceNth (n-1) newVal xs

@@ -105,6 +105,7 @@ senseItems game = [i | i <- itemList, inRange playerLoc (itemX i, itemY i)] wher
 
 applyFunction :: Game -> Function -> Game
 applyFunction game func | Datastructures.id func == "retrieveItem" = retrieveItem game (argumentToId (head (args func)))
+                        | Datastructures.id func == "useItem" = useItem game (argumentToId (head (args func)))
                         | otherwise = game
 
 canDoAction :: [Function] -> Game -> Bool
@@ -114,5 +115,5 @@ canDoAction conditions game = conditionMet game (head conditions) && canDoAction
 conditionMet :: Game -> Function -> Bool
 conditionMet game func | Datastructures.id func == "not" = not (conditionMet game (argumentToFunction (head (args func))))
                        | Datastructures.id func == "inventoryFull" = inventoryFull (player game)
-                       | Datastructures.id func == "inventoryContians" = inventoryContains (player game) (argumentToId (head (args func)))
+                       | Datastructures.id func == "inventoryContains" = inventoryContains (player game) (argumentToId (head (args func)))
                        | otherwise = False
