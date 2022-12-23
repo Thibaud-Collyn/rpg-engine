@@ -24,7 +24,7 @@ renderState game | (state game) == Selecting = renderStartScreen game
                  | (state game) == Completed = renderEndScreen
 
 step :: Float -> Game -> Game
-step _ b = gameState b
+step _ b = enemyActions (gameState b)
 
 testGame :: IO Game -> Game
 testGame = unsafePerformIO

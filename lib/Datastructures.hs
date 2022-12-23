@@ -35,7 +35,7 @@ data Player = Player {playerHP::Int, inventory::[GameItem], playerX::Int, player
 
 data Level = Level { layout::[TileLine], items::[GameItem], entities::[Entity]} deriving (Show, Eq)
 
-data GameItem = GameItem { itemId::String, itemX::Int, itemY::Int, itemName::String, itemDescription::String, itemUseTimes::UseTimes, itemActions::[Action]} deriving (Show, Eq)
+data GameItem = GameItem { itemId::String, itemX::Int, itemY::Int, itemName::String, itemDescription::String, itemUseTimes::UseTimes, itemValue::Int, itemActions::[Action]} deriving (Show, Eq)
 
 data Entity = Entity { entityId::String, entityX::Int, entityY::Int, entityName::String, entityDescription::String, entityDirection::Maybe Direction, entityHP::Maybe Int, entityValue::Maybe Int, entityActions::[Action]} deriving (Show, Eq)
 
@@ -103,3 +103,6 @@ argumentToId (TargetId id) = idToStr id
 
 argumentToFunction :: Argument -> Function
 argumentToFunction (ArgFunction function) = function
+
+useTimesToInt :: UseTimes -> Int
+useTimesToInt (TimesUsed n) = n

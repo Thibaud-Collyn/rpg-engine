@@ -12,7 +12,7 @@ import GameRenderer
 
 --------------------- Handle start screen ---------------------
 handleLevelSelectInput :: Event -> Game -> Game
-handleLevelSelectInput ev game | isKey KeyEnter ev = unsafePerformIO (initGame (gameLevels !! selector game))
+handleLevelSelectInput ev game | isKey KeyEnter ev = unsafePerformIO (initGame (selector game) (gameLevels !! selector game))
                                | isKey KeyUp ev = moveSelector (-1) game
                                | isKey KeyDown ev = moveSelector 1 game
                                | otherwise = game

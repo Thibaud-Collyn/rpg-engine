@@ -5,16 +5,16 @@ import Parser
 import Text.Parsec
 import Data.Maybe (isNothing)
 
-initGame :: String -> IO Game
-initGame levelName = do
+initGame :: Int -> String -> IO Game
+initGame selectorPos levelName = do
     levelFile <- readFile ("levels/" ++ levelName ++ ".txt")
     let levelJson = parse parseJSON "Could not parse file" levelFile
     case levelJson of
         Prelude.Left err -> error $ show err
-        Prelude.Right levelJson -> return $ initGameFromJson levelJson
+        Prelude.Right levelJson -> return $ initGameFromJson selectorPos levelJson
 
-initGameFromJson :: JSON -> Game
-initGameFromJson (Object pairs) = setPlayerLocation (Game (initPlayer (getValue (getPair pairs (ID "player")))) (initLevels (getValue ((getPair pairs (ID "levels"))))) 0 Playing 0)
+initGameFromJson :: Int -> JSON -> Game
+initGameFromJson selectorPos (Object pairs) = setPlayerLocation (Game (initPlayer (getValue (getPair pairs (ID "player")))) (initLevels (getValue ((getPair pairs (ID "levels"))))) 0 Playing selectorPos)
 
 initPlayer :: JSON -> Player
 initPlayer (Object pairs) = Player (toInt (getValue (getPair pairs (ID "hp")))) (initItems (getValue (getPair pairs (ID "inventory")))) 0 0 Datastructures.Right
@@ -43,7 +43,7 @@ initItems (Array items) = map initItem items
 
 initItem :: JSON -> GameItem
 initItem (Object item) = GameItem (toStr (getValue (getPair item (ID "id")))) (toInt (getValue (getPair item (ID "x")))) (toInt (getValue (getPair item (ID "y")))) (toStr (getValue (getPair item (ID "name")))) 
-    (toStr (getValue (getPair item (ID "description")))) (toUseTimes (getValue (getPair item (ID "useTimes")))) (initActions (getValue (getPair item (ID "actions"))))
+    (toStr (getValue (getPair item (ID "description")))) (toUseTimes (getValue (getPair item (ID "useTimes")))) (toInt (getValue (getPair item (ID "value")))) (initActions (getValue (getPair item (ID "actions"))))
 
 ------------------ Initializing entities ------------------
 initEntities :: JSON -> [Entity]

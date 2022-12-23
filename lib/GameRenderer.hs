@@ -93,7 +93,7 @@ renderActionBar :: Game -> Picture
 renderActionBar game = pictures [translate (-210.0) 90.0 (scale 0.7 0.9 (actionBar getGuiTextures)), renderActions (getActions game), translate (-300.0) 190.0 (color white (scale 0.3 0.3 (text "ACTIONS")))]
 
 renderActions :: [Action] -> Picture
-renderActions rActions = pictures [translate (-300.0) (fromIntegral (160 - (30*x))) (color white (scale 0.2 0.2 (text ((show x) ++ ") " ++ Datastructures.id (action (rActions!!x)))))) | x <- [0..(length rActions) -1]]
+renderActions rActions = pictures [translate (-300.0) (fromIntegral (160 - (30*x))) (color white (scale 0.15 0.15 (text ((show x) ++ ") " ++ Datastructures.id (action (rActions!!x)))))) | x <- [0..(length rActions) -1]]
 
 renderHP :: Player -> Picture
 renderHP player = translate (-350.0) (fromIntegral (-5*tileOffset)) (color white (scale 0.15 0.15 (text ("HP = " ++ (show (playerHP player))))))

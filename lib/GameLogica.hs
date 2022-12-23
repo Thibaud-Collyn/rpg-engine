@@ -76,7 +76,7 @@ hasClosedDoor (x, y) level | length door == 0 = False
 --------------------- gameState checks ---------------------
 gameState :: Game -> Game
 gameState game | (state game) == Selecting = game
-               | playerHP p <= 0 = unsafePerformIO (initGame (gameLevels !! selector game))
+               | playerHP p <= 0 = unsafePerformIO (initGame (selector game) (gameLevels !! selector game))
                | (getTileAt pPos currentLvlLayout) == End = nextLevelOrEnd game
                | otherwise = game
                where p = player game
@@ -86,6 +86,15 @@ gameState game | (state game) == Selecting = game
 nextLevelOrEnd :: Game -> Game
 nextLevelOrEnd game | currentLevel game == length (levels game) - 1 = game {state = Completed}
                     | otherwise = setPlayerLocation (game {currentLevel = currentLevel game + 1})
+
+enemyActions :: Game -> Game
+enemyActions game = despawnEnemies game
+
+despawnEnemies :: Game -> Game
+despawnEnemies game = game {levels = replaceNth (currentLevel game) (despawnEnemiesInLevel (levels game !! currentLevel game)) (levels game)}
+
+despawnEnemiesInLevel :: Level -> Level
+despawnEnemiesInLevel level = level {entities = [e | e <- entities level, isNothing (entityHP e) || fromJust (entityHP e) > 0]}
 
 --------------------- Player interaction ---------------------
 getActions :: Game -> [Action]
@@ -106,6 +115,9 @@ senseItems game = [i | i <- itemList, inRange playerLoc (itemX i, itemY i)] wher
 applyFunction :: Game -> Function -> Game
 applyFunction game func | Datastructures.id func == "retrieveItem" = retrieveItem game (argumentToId (head (args func)))
                         | Datastructures.id func == "useItem" = useItem game (argumentToId (head (args func)))
+                        | Datastructures.id func == "increasePlayerHp" = increasePlayerHP game (argumentToId (head (args func)))
+                        | Datastructures.id func == "decreaseHp" = decreaseHP game (argumentToId (head (args func))) (argumentToId ((args func)!!1))
+                        | Datastructures.id func == "leave" = leave game
                         | otherwise = game
 
 canDoAction :: [Function] -> Game -> Bool
