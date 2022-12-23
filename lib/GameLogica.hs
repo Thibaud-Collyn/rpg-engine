@@ -4,7 +4,7 @@ import Datastructures
 import LevelLoader
 import Graphics.Gloss.Interface.IO.Game
 import Data.Char (toLower)
-import Data.Maybe (fromJust, isNothing)
+import Data.Maybe (fromJust, isNothing, fromMaybe)
 import GHC.IO (unsafePerformIO)
 import System.Directory (getDirectoryContents)
 import Data.List
@@ -16,8 +16,9 @@ gameLevels :: [String]
 gameLevels = sort findLevelFiles
 
 findLevelFiles :: [String]
+{-# NOINLINE findLevelFiles #-}
 findLevelFiles = unsafePerformIO $ do
-      levels <- (getDirectoryContents "levels")
+      levels <- getDirectoryContents "levels"
       return $ map (reverse . drop 4 . reverse) $ filter (\x -> getExtension x == "txt") levels
 
 getExtension :: String -> String
@@ -88,13 +89,19 @@ nextLevelOrEnd game | currentLevel game == length (levels game) - 1 = game {stat
                     | otherwise = setPlayerLocation (game {currentLevel = currentLevel game + 1})
 
 enemyActions :: Game -> Game
-enemyActions game = despawnEnemies game
+enemyActions game = enemyAttack (despawnEnemies game)
 
 despawnEnemies :: Game -> Game
 despawnEnemies game = game {levels = replaceNth (currentLevel game) (despawnEnemiesInLevel (levels game !! currentLevel game)) (levels game)}
 
 despawnEnemiesInLevel :: Level -> Level
 despawnEnemiesInLevel level = level {entities = [e | e <- entities level, isNothing (entityHP e) || fromJust (entityHP e) > 0]}
+
+enemyAttack :: Game -> Game
+enemyAttack game = game {player = (player game) {playerHP = decreasePlayerHP (levels game !! currentLevel game) (player game) (ticks game)}, ticks = (ticks game) + 1}
+
+decreasePlayerHP :: Level -> Player -> Int -> Int
+decreasePlayerHP level player ticks = (playerHP player) - sum [fromMaybe 0 (entityValue e) | e <- (entities level), isEntityInRange player e && (ticks `mod` 60) == 0]
 
 --------------------- Player interaction ---------------------
 getActions :: Game -> [Action]

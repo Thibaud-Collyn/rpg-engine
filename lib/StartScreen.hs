@@ -17,9 +17,6 @@ handleLevelSelectInput ev game | isKey KeyEnter ev = unsafePerformIO (initGame (
                                | isKey KeyDown ev = moveSelector 1 game
                                | otherwise = game
 
--- handleEnter :: Game -> Game
--- handleEnter game = unsafePerformIO (loadLevel (gameLevels !! selector game))
-
 moveSelector :: Int -> Game -> Game
 moveSelector x game | canMoveSelector x game = game { selector = selector game + x }
                     | otherwise = game

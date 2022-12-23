@@ -29,7 +29,7 @@ data JSON = Number Int | String String | Actions[Action] | Array [JSON] | Object
 data GameState = Selecting | Playing | Completed
     deriving (Show, Eq)
 
-data Game = Game { player::Player, levels::[Level], currentLevel::Int, state::GameState, selector::Int} deriving (Show, Eq)
+data Game = Game { player::Player, levels::[Level], currentLevel::Int, state::GameState, selector::Int, ticks::Int} deriving (Show, Eq)
 
 data Player = Player {playerHP::Int, inventory::[GameItem], playerX::Int, playerY::Int, playerDirection::Direction} deriving (Show, Eq)
 
@@ -92,11 +92,11 @@ tileLineToArray (TileLine tileLine) = tileLine
 
 -- Returns an ampty game used in the level selector
 emptyGame :: Game
-emptyGame = Game { player = (Player 1 [] 0 0 Datastructures.Right), levels = [], currentLevel = 0, state = Selecting, selector = 0}
+emptyGame = Game { player = (Player 1 [] 0 0 Datastructures.Right), levels = [], currentLevel = 0, state = Selecting, selector = 0, ticks = 0}
 
 -- Used for testing
 emptyGameCompleted :: Game
-emptyGameCompleted = Game { player = (Player 1 [] 0 0 Datastructures.Right), levels = [], currentLevel = 0, state = Completed, selector = 0}
+emptyGameCompleted = Game { player = (Player 1 [] 0 0 Datastructures.Right), levels = [], currentLevel = 0, state = Completed, selector = 0, ticks = 0}
 
 argumentToId :: Argument -> String
 argumentToId (TargetId id) = idToStr id

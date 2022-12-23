@@ -123,7 +123,7 @@ parseTest :: String -> IO ()
 parseTest level = do
     withFile level ReadMode (\handle -> do
         contents <- hGetContents handle
-        let parsed = (parse parseJSON "error" (contents))
+        let parsed = (parse parseJSON "error" contents)
         case parsed of
             Prelude.Left err -> error $ show err
             Prelude.Right json -> putStr (show json)

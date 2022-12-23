@@ -18,12 +18,23 @@ player: {
 levels: [
     {
         layout: {
-            | * * * * * * * *
-            | * . . . . . . *
-            | * s . . . . . *
-            | * . . . . . e *
-            | * . . . . . . *
-            | * * * * * * * *
+            | * * * * * *
+            | * s . . e *
+            | * * * * * *
+        },
+        
+        items: [],
+
+        entities: []
+    },
+    {
+        layout: {
+            | * * * * * * * * * * * *
+            | * . . . . . . . . . . *
+            | * s . . . * * * * * . *
+            | * . . . . . e * x * . *
+            | * . . . . * * * x * . *
+            | * * * * * * x x x * * *
         },
 
         items: [
@@ -54,6 +65,19 @@ levels: [
                     [not(inventoryFull())] retrieveItem(potion),
                     [] leave()
                 }
+            },
+            {
+                id: "key",
+                x: 9,
+                y: 0,
+                name: "Sleutel",
+                description: "Deze sleutel kan een deur openen",
+                useTimes: 1,
+                value: 0,
+                actions: {
+                    [not(inventoryFull())] retrieveItem(key),
+                    [] leave()
+                }
             }
         ],
 
@@ -71,6 +95,19 @@ levels: [
                     [inventoryContains(potion)] increasePlayerHp(potion),
                     [inventoryContains(sword)] decreaseHp(devil, sword),
                     [] decreaseHp(devil, dagger),
+                    [] leave()
+                }
+            },
+            {
+                id: "door",
+                x: 4,
+                y: 1,
+                name: "Deur",
+                description: "Deze deur kan geopend worden met een sleutel",
+                direction: right,
+
+                actions: {
+                    [inventoryContains(key)] useItem(key),
                     [] leave()
                 }
             }

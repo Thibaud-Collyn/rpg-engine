@@ -29,32 +29,13 @@ removeFromLevel game item = [if i == (currentLevel game) then removeItem ((level
 removeItem :: Level -> GameItem -> Level
 removeItem level item = level {items = [i | i <- items level, i /= item]}
 
-inRange :: (Int, Int) -> (Int, Int) -> Bool
-inRange (x1, y1) (x2, y2) | x1-1 == x2 && y1-1 == y2 = True
-                          | x1 == x2 && y1-1 == y2 = True
-                          | x1-2 == x2 && y1-1 == y2 = True
-                          | x1-1 == x2 && y1 == y2 = True
-                          | x1-1 == x2 && y1-2 == y2 = True
-                          | otherwise = False
-
-isEntityInRange :: Player -> Entity -> Bool
-isEntityInRange player entity = inRange (playerX player, playerY player) (entityX entity, entityY entity)
-
-getEntity :: Level -> String -> [Entity]
-getEntity level id = [entity | entity <- entities level, entityId entity == id]
-
-getItems :: Level -> String -> [GameItem]
-getItems level id = [item | item <- items level, itemId item == id]
-
+--------------------- Use item (= opening door) ---------------------
 useItem :: Game -> String -> Game
 useItem game item = useTimesDecrease item (game {levels = replaceNth (currentLevel game) lvl {entities = [if e == (findLockedDoor game item) then e {entityValue = Just 0} else e |e <- entities lvl]} (levels game)}) where lvl = levels game !! currentLevel game
 
 -- Finds a locked door that uses key with given id and is in range of the player
 findLockedDoor :: Game -> String -> Entity
-findLockedDoor game id = head [entity | entity <- entities (levels game !! currentLevel game), (getKeyId entity) == id && inRange (playerX (player game), playerY (player game)) (entityX entity, entityY entity)]
-
-getKeyId :: Entity -> String
-getKeyId entity = head [argumentToId (head (args (action a))) | a <- entityActions entity, (Datastructures.id (action a)) == "useItem"]
+findLockedDoor game id = head [entity | entity <- (entities (levels game !! currentLevel game)), isEntityInRange (player game) entity]
 
 -- replaces nth element in a list with a new value
 replaceNth :: Int -> a -> [a] -> [a]
@@ -91,5 +72,25 @@ removeFromInventory :: Game -> String -> Game
 removeFromInventory game id = game {player = (player game) {inventory = [item | item <- inventory (player game), itemId item /= id]}}
 
 ------------------- Leave Function -------------------
+-- Implementation of function not clear so this functions does nothing...
 leave :: Game -> Game
-leave game = game {player = (player game) {playerHP = (playerHP (player game)) - 10}}
+leave game = game
+
+------------------- Helper Functions -------------------
+-- Might seem weird but these endexes are needed because the player is in the coordinate system of the level layout, entities and items are in the coordinate system of the level
+inRange :: (Int, Int) -> (Int, Int) -> Bool
+inRange (x1, y1) (x2, y2) | x1-1 == x2 && y1-1 == y2 = True
+                          | x1 == x2 && y1-1 == y2 = True
+                          | x1-2 == x2 && y1-1 == y2 = True
+                          | x1-1 == x2 && y1 == y2 = True
+                          | x1-1 == x2 && y1-2 == y2 = True
+                          | otherwise = False
+
+isEntityInRange :: Player -> Entity -> Bool
+isEntityInRange player entity = inRange (playerX player, playerY player) (entityX entity, entityY entity)
+
+getEntity :: Level -> String -> [Entity]
+getEntity level id = [entity | entity <- entities level, entityId entity == id]
+
+getItems :: Level -> String -> [GameItem]
+getItems level id = [item | item <- items level, itemId item == id]
